@@ -43,7 +43,7 @@ export const feedSlice = createSlice({
       })
       .addCase(fetchFeeds.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Ошибка при загрузке ленты заказов';
+        state.error = action.error.message ?? 'Ошибка при загрузке ленты заказов';
       })
 
       .addCase(fetchUserOrders.pending, (state) => {
@@ -57,7 +57,7 @@ export const feedSlice = createSlice({
       })
       .addCase(fetchUserOrders.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Ошибка при загрузке истории заказов';
+        state.error = action.error.message ?? 'Ошибка при загрузке истории заказов';
       });
   },
 });

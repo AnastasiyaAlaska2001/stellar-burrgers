@@ -26,14 +26,20 @@ export const OrderInfo: FC = () => {
     const orderNum = Number(number);
 
     return (
-      feedOrders.find((item: TOrder) => item.number === orderNum) ||
+      feedOrders.find((item: TOrder) => item.number === orderNum) ??
       (fetchedOrder?.number === orderNum ? fetchedOrder : null)
     );
   }, [number, feedOrders, fetchedOrder]);
 
   useEffect(() => {
     if (number && !orderData) {
-      dispatch(getOrderByNumber(Number(number)));
+      void (async (): Promise<void> => {
+        try {
+          await dispatch(getOrderByNumber(Number(number))).unwrap();
+        } catch (error) {
+          console.error('Не удалось загрузить заказ:', error);
+        }
+      })();
     }
   }, [dispatch, number, orderData]);
 
@@ -42,9 +48,7 @@ export const OrderInfo: FC = () => {
 
     const date = new Date(orderData.createdAt);
 
-    type TIngredientsWithCount = {
-      [key: string]: TIngredient & { count: number };
-    };
+    type TIngredientsWithCount = Record<string, TIngredient & { count: number }>;
 
     const ingredientsInfo = orderData.ingredients.reduce(
       (acc: TIngredientsWithCount, item: string) => {

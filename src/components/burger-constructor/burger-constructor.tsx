@@ -1,11 +1,13 @@
-import { useMemo } from 'react';
-import type { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { BurgerConstructorUI } from '@ui';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { clearConstructor } from '../../services/constructor-slice';
 import { placeOrder, resetOrderModal } from '../../services/order-slice';
 import { useDispatch, useSelector } from '../../services/store';
+
 import type { TConstructorIngredient } from '@utils-types';
+import type { FC } from 'react';
 
 export const BurgerConstructor: FC = () => {
   const navigate = useNavigate();
@@ -15,28 +17,38 @@ export const BurgerConstructor: FC = () => {
   const constructorItems = useSelector((state) => state.burgerConstructor);
   const { orderRequest, orderModalData } = useSelector((state) => state.order);
 
-  const onOrderClick = () => {
+  const onOrderClick = (): void => {
     if (!constructorItems.bun || orderRequest) return;
 
     if (!user) {
-      navigate('/login');
-      return;
+      void (async (): Promise<void> => {
+        try {
+          await navigate('/login');
+          return;
+        } catch (error) {
+          console.error(error);
+        }
+      });
     }
 
     const ingredientIds = [
       constructorItems.bun._id,
       ...constructorItems.ingredients.map((item: TConstructorIngredient) => item._id),
-      constructorItems.bun._id
+      constructorItems.bun._id,
     ];
 
-    dispatch(placeOrder(ingredientIds)).then((action) => {
+    try {
+      const action = dispatch(placeOrder(ingredientIds));
+
       if (placeOrder.fulfilled.match(action)) {
         dispatch(clearConstructor());
       }
-    });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const closeOrderModal = () => {
+  const closeOrderModal = (): void => {
     dispatch(resetOrderModal());
   };
 

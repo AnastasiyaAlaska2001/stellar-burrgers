@@ -51,3 +51,13 @@ export type TFeedState = {
   isLoading: boolean;
   error: unknown;
 };
+
+export type LocationState = {
+  from?: {
+    pathname?: string;
+  };
+};
+
+export type LocationStateBackground = {
+  background?: string;
+};

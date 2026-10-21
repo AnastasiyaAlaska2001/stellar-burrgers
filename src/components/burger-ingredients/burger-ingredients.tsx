@@ -1,8 +1,8 @@
 import { BurgerIngredientsUI } from '@ui';
 import { useMemo, useState, useRef } from 'react';
 
-import { useSelector } from '../../services/store';
 import { selectIngredients } from '../../services/ingredient-slice';
+import { useSelector } from '../../services/store';
 
 import type { TIngredient, TTabMode } from '@utils-types';
 
@@ -43,7 +43,9 @@ export const BurgerIngredients = (): React.JSX.Element => {
     [ingredients]
   );
 
-  const dummyRef = () => {};
+  const dummyRef = (): void => {
+    console.log('emptyRef');
+  };
 
   return (
     <BurgerIngredientsUI

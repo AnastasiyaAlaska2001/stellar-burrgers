@@ -18,34 +18,51 @@ import { useDispatch } from '../../services/store';
 import { checkUserAuth } from '../../services/user-slice';
 import { ProtectedRoute } from '../protected-route/protected-route';
 
+import type { LocationStateBackground } from '@/utils/types';
 import type { FC } from 'react';
+
+import '../../index.css';
+
+import styles from './app.module.css';
 
 export const App: FC = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Сохраняем фоновый маршрут для корректного открытия модальных окон поверх текущей страницы
-  const backgroundLocation = location.state?.background;
+  const state = location.state as LocationStateBackground | null;
+  const backgroundLocation = state?.background;
 
   useEffect(() => {
-    // 1. Проверяем статус авторизации пользователя (внутри проверяется наличие refreshToken)
-    dispatch(checkUserAuth());
-    // 2. Первоначальная загрузка ингредиентов
-    dispatch(fetchIngredients());
+    void (async (): Promise<void> => {
+      try {
+        await dispatch(checkUserAuth());
+        await dispatch(fetchIngredients());
+      } catch (error) {
+        console.error('Ошибка инициализации данных:', error);
+      }
+    })();
   }, [dispatch]);
 
-  const handleModalClose = () => {
+  const handleModalClose = (): void => {
     // Возвращаемся на предыдущий маршрут при закрытии модального окна
-    navigate(-1);
+    void (async (): Promise<void> => {
+      try {
+        await navigate(-1);
+      } catch (error) {
+        console.error(error);
+      }
+    });
   };
 
+  const appClass = styles.app;
+
   return (
-    <div className="app">
+    <div className={appClass}>
       <AppHeader />
 
       {/* Основные маршруты */}
-      <Routes location={backgroundLocation || location}>
+      <Routes location={backgroundLocation ?? location}>
         <Route path="/" element={<ConstructorPage />} />
         <Route path="/feed" element={<Feed />} />
 

@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import { getOrderByNumberApi, orderBurgerApi } from '../utils/burger-api';
+
 import type { TOrder } from '@utils-types';
 
 export const getOrderByNumber = createAsyncThunk(
@@ -18,13 +20,13 @@ export const placeOrder = createAsyncThunk(
   }
 );
 
-export interface IOrderState {
+export type IOrderState = {
   orderByNumber: TOrder | null;
   orderModalData: TOrder | null;
   orderRequest: boolean;
   isLoading: boolean;
   error: string | null;
-}
+};
 
 const initialState: IOrderState = {
   orderByNumber: null,
@@ -56,7 +58,7 @@ export const orderSlice = createSlice({
       })
       .addCase(getOrderByNumber.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Failed to fetch order';
+        state.error = action.error.message ?? 'Failed to fetch order';
       })
 
       .addCase(placeOrder.pending, (state) => {
@@ -69,7 +71,7 @@ export const orderSlice = createSlice({
       })
       .addCase(placeOrder.rejected, (state, action) => {
         state.orderRequest = false;
-        state.error = action.error.message || 'Failed to place order';
+        state.error = action.error.message ?? 'Failed to place order';
       });
   },
 });

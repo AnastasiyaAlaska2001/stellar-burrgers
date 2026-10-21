@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import {
   getUserApi,
   loginUserApi,
@@ -6,9 +7,10 @@ import {
   updateUserApi,
   logoutApi,
 } from '../utils/burger-api';
-import type { TUser } from '@utils-types';
 import { deleteCookie, setCookie } from '../utils/cookie';
+
 import type { TLoginData, TRegisterData } from '../utils/burger-api';
+import type { TUser } from '@utils-types';
 
 export const checkUserAuth = createAsyncThunk(
   'user/checkUserAuth',
@@ -57,12 +59,12 @@ export const logoutUser = createAsyncThunk('user/logoutUser', async () => {
   }
 });
 
-interface IUserState {
+type IUserState = {
   user: TUser | null;
   isAuthChecked: boolean;
   isLoading: boolean;
   error: string | null;
-}
+};
 
 const initialState: IUserState = {
   user: null,
@@ -91,7 +93,7 @@ export const userSlice = createSlice({
         state.user = null;
         state.isAuthChecked = true;
         state.isLoading = false;
-        state.error = (action.payload as string) || action.error.message || null;
+        state.error = (action.payload as string) ?? action.error.message ?? null;
       })
 
       .addCase(loginUser.pending, (state) => {
@@ -105,7 +107,7 @@ export const userSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Login failed';
+        state.error = action.error.message ?? 'Login failed';
       })
 
       .addCase(registerUser.pending, (state) => {
@@ -119,7 +121,7 @@ export const userSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Registration failed';
+        state.error = action.error.message ?? 'Registration failed';
       })
 
       .addCase(updateUser.pending, (state) => {
@@ -132,7 +134,7 @@ export const userSlice = createSlice({
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Update failed';
+        state.error = action.error.message ?? 'Update failed';
       })
 
       .addCase(logoutUser.fulfilled, (state) => {

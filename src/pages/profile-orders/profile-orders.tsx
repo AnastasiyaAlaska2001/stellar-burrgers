@@ -10,9 +10,14 @@ import type { FC } from 'react';
 export const ProfileOrders: FC = () => {
   const dispatch = useDispatch();
   const { userOrders, isLoading } = useSelector((state) => state.feed);
-
   useEffect(() => {
-    dispatch(fetchUserOrders());
+    void (async (): Promise<void> => {
+      try {
+        await dispatch(fetchUserOrders());
+      } catch (error) {
+        console.error('Ошибка загрузки заказов:', error);
+      }
+    })();
   }, [dispatch]);
 
   if (isLoading && !userOrders.length) {

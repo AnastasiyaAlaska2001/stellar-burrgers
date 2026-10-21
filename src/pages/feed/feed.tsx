@@ -12,11 +12,15 @@ export const Feed: FC = () => {
   const { orders, isLoading } = useSelector((state) => state.feed);
 
   useEffect(() => {
-    dispatch(fetchFeeds());
+    void (async (): Promise<void> => {
+      await dispatch(fetchFeeds());
+    })();
   }, [dispatch]);
 
-  const handleGetFeeds = () => {
-    dispatch(fetchFeeds());
+  const handleGetFeeds = (): void => {
+    void (async (): Promise<void> => {
+      await dispatch(fetchFeeds());
+    })();
   };
 
   // Показываем Preloader только при ВЕРВИЧНОЙ загрузке, когда данных еще нет

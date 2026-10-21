@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../services/store';
 import { loginUser } from '../../services/user-slice';
 
+import type { LocationState } from '@/utils/types';
 import type { FC, SyntheticEvent } from 'react';
 
 export const Login: FC = () => {
@@ -15,27 +16,32 @@ export const Login: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const state = location.state as LocationState | null;
+
   const { error } = useSelector((state) => state.user);
 
-  const from = location.state?.from?.pathname || '/';
+  const from = state?.from?.pathname ?? '/';
 
-  const handleSubmit = (e: SyntheticEvent) => {
+  const handleSubmit = (e: SyntheticEvent): void => {
     e.preventDefault();
 
     dispatch(loginUser({ email, password }))
       .unwrap()
       .then(() => {
-        // Перенаправляем пользователя обратно на исходную страницу или на главную
-        navigate(from, { replace: true });
+        // Успех: редирект
+        void (async (): Promise<void> => {
+          await navigate(from ?? '/', { replace: true });
+        });
       })
-      .catch(() => {
-        // Ошибка сохранится в Redux-сторе (state.user.error)
+      .catch((error) => {
+        console.error('Ошибка входа:', error);
+        alert('Не удалось войти. Проверьте логин и пароль.');
       });
   };
 
   return (
     <LoginUI
-      errorText={error || ''}
+      errorText={error ?? ''}
       email={email}
       setEmail={setEmail}
       password={password}
