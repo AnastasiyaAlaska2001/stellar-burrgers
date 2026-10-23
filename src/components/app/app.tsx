@@ -52,7 +52,7 @@ export const App: FC = () => {
       } catch (error) {
         console.error(error);
       }
-    });
+    })();
   };
 
   const appClass = styles.app;

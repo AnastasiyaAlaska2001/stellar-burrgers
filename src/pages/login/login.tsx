@@ -31,7 +31,7 @@ export const Login: FC = () => {
         // Успех: редирект
         void (async (): Promise<void> => {
           await navigate(from ?? '/', { replace: true });
-        });
+        })();
       })
       .catch((error) => {
         console.error('Ошибка входа:', error);

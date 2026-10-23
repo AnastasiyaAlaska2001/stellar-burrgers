@@ -28,7 +28,7 @@ export const BurgerConstructor: FC = () => {
         } catch (error) {
           console.error(error);
         }
-      });
+      })();
     }
 
     const ingredientIds = [
@@ -37,15 +37,14 @@ export const BurgerConstructor: FC = () => {
       constructorItems.bun._id,
     ];
 
-    try {
-      const action = dispatch(placeOrder(ingredientIds));
-
-      if (placeOrder.fulfilled.match(action)) {
+    dispatch(placeOrder(ingredientIds))
+      .unwrap()
+      .then(() => {
         dispatch(clearConstructor());
-      }
-    } catch (error) {
-      console.error(error);
-    }
+      })
+      .catch((error) => {
+        console.error('Order failed', error);
+      });
   };
 
   const closeOrderModal = (): void => {

@@ -13,7 +13,7 @@ export const ProfileMenu: FC = () => {
   const handleLogout = (): void => {
     void (async (): Promise<void> => {
       await dispatch(logoutUser());
-    });
+    })();
   };
 
   return <ProfileMenuUI handleLogout={handleLogout} pathname={pathname} />;
