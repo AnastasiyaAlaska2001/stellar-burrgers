@@ -21,20 +21,14 @@ export const BurgerConstructor: FC = () => {
     if (!constructorItems.bun || orderRequest) return;
 
     if (!user) {
-      void (async (): Promise<void> => {
-        try {
-          await navigate('/login');
-          return;
-        } catch (error) {
-          console.error(error);
-        }
-      })();
+      void navigate('/login');
+      return;
     }
 
     const ingredientIds = [
       constructorItems.bun._id,
       ...constructorItems.ingredients.map((item: TConstructorIngredient) => item._id),
-      constructorItems.bun._id,
+      // Убрали дубликат bun._id
     ];
 
     dispatch(placeOrder(ingredientIds))
