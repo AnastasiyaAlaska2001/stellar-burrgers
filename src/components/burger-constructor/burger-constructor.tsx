@@ -28,7 +28,6 @@ export const BurgerConstructor: FC = () => {
     const ingredientIds = [
       constructorItems.bun._id,
       ...constructorItems.ingredients.map((item: TConstructorIngredient) => item._id),
-      // Убрали дубликат bun._id
     ];
 
     dispatch(placeOrder(ingredientIds))
