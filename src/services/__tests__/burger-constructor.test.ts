@@ -99,8 +99,24 @@ describe('Проверка редьюсера burger-constructor', () => {
     expect(state.ingredients).toHaveLength(1);
 
     const added = state.ingredients[0];
+
     expect(added.id).toBeDefined();
     expect(added.id).not.toBe(mockIngredient.id);
+  });
+
+  it('Проверка добавления булки через addIngredient', () => {
+    const prevState = {
+      ...initialState,
+      bun: null,
+    };
+
+    const state = constructorSlice.reducer(prevState, addIngredient(mockBun));
+
+    expect(state.bun).not.toBeNull();
+    expect(state.bun?.type).toBe('bun');
+    expect(state.bun?.id).toBeDefined();
+    expect(state.bun?.id).not.toBe(mockBun.id);
+    expect(state.ingredients).toHaveLength(0);
   });
 
   it('removeIngredient должен удалять ингредиент по id и сдвигать массив', () => {
@@ -110,41 +126,47 @@ describe('Проверка редьюсера burger-constructor', () => {
     };
 
     const indexBefore = prevState.ingredients.findIndex((i) => i.id === 'test-3');
-    expect(indexBefore).toBeGreaterThanOrEqual(0); // убеждаемся, что он вообще был
+
+    expect(indexBefore).toBeGreaterThanOrEqual(0);
 
     const state = constructorSlice.reducer(prevState, removeIngredient('test-3'));
 
     const existsAfter = state.ingredients.some((i) => i.id === 'test-3');
+
     expect(existsAfter).toBe(false);
+
+    expect(state.ingredients).toHaveLength(prevState.ingredients.length - 1);
   });
 
   it('Проверка moveIngredientUp', () => {
     const sliceInitialState = {
       ...initialState,
-      ingredients: mockIngredients,
+      ingredients: [...mockIngredients],
     };
 
     const newState = constructorSlice.reducer(
       sliceInitialState,
       moveIngredient({ index: 0, moveIndex: 1 })
     );
+
     expect(newState.ingredients[1]).toEqual(mockIngredient);
   });
 
   it('Проверка moveIngredientDown', () => {
     const sliceInitialState = {
       ...initialState,
-      ingredients: mockIngredients,
+      ingredients: [...mockIngredients],
     };
 
     const newState = constructorSlice.reducer(
       sliceInitialState,
-      moveIngredient({ index: 1, moveIndex: 1 })
+      moveIngredient({ index: 0, moveIndex: 2 })
     );
-    expect(newState.ingredients[0]).toEqual(mockIngredient);
+
+    expect(newState.ingredients[2]).toEqual(mockIngredient);
   });
 
-  it('Проверка placeOrder.fulfilled — сброс корзины после заказа', () => {
+  it('Проверка clearConstructor — сброс конструктора после заказа', () => {
     const sliceInitialState = {
       ...initialState,
       bun: mockBun,
@@ -161,6 +183,7 @@ describe('Проверка редьюсера burger-constructor', () => {
     const newState = constructorSlice.reducer(undefined, {
       type: 'unknown',
     });
+
     expect(newState).toEqual(initialState);
   });
 });

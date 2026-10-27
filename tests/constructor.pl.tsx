@@ -1,24 +1,44 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Работа конструктора бургеров', () => {
-  test('Отображение ингридиентов', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
+    await page.routeFromHAR('./tests/har-files/ingredients.har', {
+      url: '**/api/ingredients',
+      notFound: 'fallback',
+    });
+  });
+
+  test.afterEach(async ({ page, context }) => {
+    await context.clearCookies();
+
+    await page
+      .evaluate(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+      })
+      .catch(() => {});
+  });
+
+  test('Отображение ингредиентов', async ({ page }) => {
     await page.goto('/');
 
     await expect(page.getByText('Краторная булка N-200i')).toBeVisible();
+
     await expect(page.getByText('Флюоресцентная булка R2-D3')).toBeVisible();
   });
 
-  test('Добавление ингридиентов', async ({ page }) => {
+  test('Добавление ингредиентов', async ({ page }) => {
     await page.goto('/');
 
     await expect(page.getByTestId('constructor-element-bottom')).toContainText(
       'Выберите булки'
     );
+
     await expect(page.getByTestId('constructor-element-top')).toContainText(
       'Выберите булки'
     );
 
-    //Добавим первую булку
+    // Добавляем булку
     await expect(page.getByText('Краторная булка N-200i')).toBeVisible();
 
     const bun = page
@@ -30,10 +50,12 @@ test.describe('Работа конструктора бургеров', () => {
     await expect(page.getByTestId('constructor-element-top')).toContainText(
       'Краторная булка N-200i'
     );
+
     await expect(page.getByTestId('constructor-element-bottom')).toContainText(
       'Краторная булка N-200i'
     );
 
+    // Добавляем начинку
     await expect(page.getByText('Биокотлета из марсианской Магнолии')).toBeVisible();
 
     const ingredient = page
@@ -41,10 +63,12 @@ test.describe('Работа конструктора бургеров', () => {
       .filter({ hasText: 'Биокотлета из марсианской Магнолии' });
 
     await ingredient.getByRole('button', { name: 'Добавить' }).click();
+
     await expect(page.getByTestId('constructor-element').nth(0)).toContainText(
       'Биокотлета из марсианской Магнолии'
     );
 
+    // Добавляем соус
     await expect(page.getByText('Соус Spicy-X')).toBeVisible();
 
     const sauce = page
@@ -62,6 +86,7 @@ test.describe('Работа конструктора бургеров', () => {
     await page.goto('/');
 
     await expect(page.getByText('Флюоресцентная булка R2-D3')).toBeVisible();
+
     await expect(page.getByText('Краторная булка N-200i')).toBeVisible();
 
     const ingredient = page
@@ -69,23 +94,37 @@ test.describe('Работа конструктора бургеров', () => {
       .filter({ hasText: 'Краторная булка N-200i' });
 
     await expect(page.getByTestId('modal')).not.toBeVisible();
+
     await ingredient.getByRole('link').click();
+
     await expect(page.getByTestId('modal')).toBeVisible();
+
     await expect(page.getByTestId('modal')).toContainText('Краторная булка N-200i');
+
     await expect(page.getByTestId('modal')).toContainText('420');
     await expect(page.getByTestId('modal')).toContainText('80');
     await expect(page.getByTestId('modal')).toContainText('24');
     await expect(page.getByTestId('modal')).toContainText('53');
 
+    // Закрытие кнопкой
     await page.getByTestId('modal-close').click();
+
     await expect(page.getByTestId('modal')).not.toBeVisible();
 
+    // Закрытие кликом по оверлею
     await ingredient.getByRole('link').click();
-    await page.getByTestId('modal-overlay').click({ position: { x: 10, y: 10 } });
+
+    await page.getByTestId('modal-overlay').click({
+      position: { x: 10, y: 10 },
+    });
+
     await expect(page.getByTestId('modal')).not.toBeVisible();
 
+    // Закрытие клавишей Escape
     await ingredient.getByRole('link').click();
+
     await page.keyboard.press('Escape');
+
     await expect(page.getByTestId('modal')).not.toBeVisible();
   });
 
@@ -93,7 +132,7 @@ test.describe('Работа конструктора бургеров', () => {
     await page.addInitScript(() => {
       localStorage.setItem(
         'refreshToken',
-        '6d0ee3f6f91402596d9ee508a0d31ce3a3410a35f862884e8d2e15b9b8acdd0cdd503aed58c6d22a'
+        '4c699a90f721f950be38a9a3799696695db632064105a3c5706718cc3c8466d738b3e7b2837548de'
       );
     });
 
@@ -101,7 +140,7 @@ test.describe('Работа конструктора бургеров', () => {
       {
         name: 'accessToken',
         value:
-          'Bearer%20eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTAwNjZiNmExNzJkMDAxYjk5NDc1YyIsImlhdCI6MTc4OTA1NjMzOCwiZXhwIjoxNzg5MDU3NTM4fQ.NfSRNZsoLElacIRYTXuZKZk4q2bLuv-vQXkZpoYyeIM',
+          'Bearer%20eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZTBhY2FjOWMxN2M0NmViNjc2MWRmNyIsImlhdCI6MTc5MzEwOTE2NCwiZXhwIjoxNzkzMTEwMzY0fQ.O6fxeBH0FtvJxxW1u7_ga0QVte3NQ4vgIf_JfTPLlr8',
         domain: 'localhost',
         path: '/',
       },
@@ -118,47 +157,47 @@ test.describe('Работа конструктора бургеров', () => {
     });
 
     await page.goto('/');
+
     await expect(page.getByText('test-user')).toBeVisible();
 
+    // Добавляем булку
     const bun = page
       .getByTestId('ingredient-element')
       .filter({ hasText: 'Краторная булка N-200i' });
+
     await bun.getByRole('button', { name: 'Добавить' }).click();
 
+    // Добавляем начинку
     const ingredient = page
       .getByTestId('ingredient-element')
       .filter({ hasText: 'Биокотлета из марсианской Магнолии' });
+
     await ingredient.getByRole('button', { name: 'Добавить' }).click();
 
     await expect(page.getByTestId('order-number')).not.toBeVisible();
+
     await page.getByText('Оформить заказ').click();
 
     await expect(page.getByTestId('modal')).toBeVisible();
+
     await expect(page.getByTestId('order-number')).toBeVisible();
+
     await expect(page.getByTestId('order-number')).toContainText('110076');
 
+    // Закрываем модальное окно заказа
     await page.getByTestId('modal-close').click();
+
     await expect(page.getByTestId('modal')).not.toBeVisible();
 
+    // Проверяем, что конструктор очищен
     await expect(page.getByTestId('constructor-element-bottom')).toHaveText(
       'Выберите булки'
     );
+
     await expect(page.getByTestId('constructor-element-top')).toHaveText(
       'Выберите булки'
     );
+
     await expect(page.getByTestId('constructor-element')).toHaveText('Выберите начинку');
-  });
-
-  test.afterEach(async ({ page, context }) => {
-    await context.clearCookies();
-    await page.evaluate(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-    });
-
-    await page.routeFromHAR('./tests/har-files/ingredients.har', {
-      url: '**/api/ingredients',
-      notFound: 'abort',
-    });
   });
 });
