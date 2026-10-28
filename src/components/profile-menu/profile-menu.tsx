@@ -1,11 +1,19 @@
 import { ProfileMenuUI } from '@ui';
 import { useLocation } from 'react-router-dom';
 
-export const ProfileMenu = (): React.JSX.Element => {
+import { useDispatch } from '../../services/store';
+import { logoutUser } from '../../services/user-slice';
+
+import type { FC } from 'react';
+
+export const ProfileMenu: FC = () => {
   const { pathname } = useLocation();
+  const dispatch = useDispatch();
 
   const handleLogout = (): void => {
-    // TODO: Разлогинить пользователя
+    void (async (): Promise<void> => {
+      await dispatch(logoutUser());
+    })();
   };
 
   return <ProfileMenuUI handleLogout={handleLogout} pathname={pathname} />;
