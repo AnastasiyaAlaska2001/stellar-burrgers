@@ -16,7 +16,9 @@ test.describe('Работа конструктора бургеров', () => {
         localStorage.clear();
         sessionStorage.clear();
       })
-      .catch(() => {});
+      .catch((e) => {
+        console.error(e);
+      });
   });
 
   test('Отображение ингредиентов', async ({ page }) => {
